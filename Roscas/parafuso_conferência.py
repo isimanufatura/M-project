@@ -1,5 +1,6 @@
 import numpy as np
 from typing import Literal
+import sys
 
 import warnings
 from colorama import Fore, Style, init
@@ -42,7 +43,6 @@ def parafuso_conferencia(
         Considera o atrito entre os filetes para a pré-carga do parafuso
         Valor padrão de 0.21
 
-    
     '''
     
     # ====== Check definição de Classe =====
@@ -63,10 +63,15 @@ def parafuso_conferencia(
                 f"Para a classe {classe}, o diâmetro deve estar entre {d_min} e {d_max} mm."
             )
     else:
-        raise ValueError(f"Classe fornececida ({classe}) inválida.")
+        print(f'{Fore.RED}{Style.BRIGHT}ERRO:{Style.NORMAL} Classe fornecida ({classe} inválida)')
+        print(f'{Fore.CYAN}{Style.BRIGHT}Sugestão:{Style.NORMAL} Utilize uma das seguintes opções:'+
+              f'\'4.6\',\'4.8\',\'5.8\',\'8.8\',\'9.8\',\'10.9\',\'12.9\'')
+        sys.exit(0)
+    
     
     # ====== Check definição de tipo =====
     if tipo not in ("ISO", "UNS"):
+        print(f'{Fore.RED}{Style.BRIGHT}ERRO:{Style.NORMAL} Tipo fornecido ({classe} inválido)')
         raise ValueError("Tipo fornecido inválido")
     
     # Resistência mínima de prova (Tabela 15-7)
@@ -85,43 +90,6 @@ def parafuso_conferencia(
     }
     
     Sp, Sy, Sut = sigma_crit[classe]
-    
-    sigma_lim = {
-        # Classe : # MPa
-        '4.6'    : (225,240,400),
-        '4.8'    : (310,340,420),
-        '5.8'    : (380,420,520),
-        '8.8'    : (600,660,830),
-        '9.8'    : (650,720,900),
-        '10.9'   : (830,940,1040),
-        '12.9'   : (970,1100,1220),
-    }
-    
-    # Resistência mínima de escoamento (Tabela 15-7)
-    sigma_esc = {
-        # Classe : # MPa
-        '4.6'    : 240,
-        '4.8'    : 340,
-        '5.8'    : 420,
-        '8.8'    : 660,
-        '9.8'    : 720,
-        '10.9'   : 940,
-        '12.9'   : 1100,
-    }
-    
-    # Resistência mínima à tração (Tabela 15-7)
-    sigma_rup = {
-        # Classe : # MPa
-        '4.6'    : 400,
-        '4.8'    : 420,
-        '5.8'    : 520,
-        '8.8'    : 830,
-        '9.8'    : 900,
-        '10.9'   : 1040,
-        '12.9'   : 1220,
-    }
-   
-    
     
     # ====== Cálculo diâmetros parafuso ====== 
     x1 = 0.649519
@@ -159,8 +127,6 @@ def parafuso_conferencia(
         As = As_o
         print('As_o menor')
         
-    
-    
     # ====== Cálculo Tensão ======
     if F_t != 0 and F_c == 0:
         sigma_n = calc_tensão(F_t,A_t)
@@ -239,7 +205,7 @@ def vonMises(
 parafuso_conferencia(
     d = 6,
     passo = 1,
-    classe = '8.8',
+    classe = '10.8',
     tipo = 'ISO',
     F_t = 3389.22,
     F_c = 4883.00)
